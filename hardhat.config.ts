@@ -11,6 +11,9 @@ const privateKey = process.env.PRIVATE_KEY || '';
 const INFURA_KEY = process.env.INFURA_KEY || '';
 const ETHERSCAN_KEY = process.env.ETHERSCAN_KEY;
 
+console.log(privateKey , INFURA_KEY , ETHERSCAN_KEY)
+
+
 // network rpc urls
 const GOERLI_RPC = 'https://goerli.infura.io/v3/' + INFURA_KEY;
 const SEPOLIA_RPC = 'https://sepolia.infura.io/v3/' + INFURA_KEY;

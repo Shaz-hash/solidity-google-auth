@@ -1,3 +1,6 @@
+// const fetch = require("node-fetch");
+
+import { default as fetch, Headers } from 'node-fetch';
 
 export async function getJwks() {
   const googleCerts = await fetch('https://www.googleapis.com/oauth2/v3/certs').then(res => res.json());

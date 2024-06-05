@@ -1,0 +1,6 @@
+shazer@Shazers-MacBook-Air solidity-google-auth % npx hardhat run scripts/deploy_JWKSOracle.ts --network sepolia
+
+0x29a51884dea81b2eb575cd46bd51bd703cfb4c45e44ff0ee00f113b7b4339088 f95f2b17b00a4d24b20398a713322329 45QAVBQBP887SDN66BDU7GD5G5XVV3ZBFG
+0x29a51884dea81b2eb575cd46bd51bd703cfb4c45e44ff0ee00f113b7b4339088 f95f2b17b00a4d24b20398a713322329 45QAVBQBP887SDN66BDU7GD5G5XVV3ZBFG
+Deployed JWKSOracle at 0x9d9749c50FaE5533ffb86ea3a5EffA10559eadB4
+shazer@Shazers-MacBook-Air solidity-google-auth % 
