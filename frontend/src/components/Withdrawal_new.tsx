@@ -16,15 +16,10 @@ import { Buffer } from "buffer";
 import SocialLock from "../../../artifacts/contracts/SocialLock.sol/SocialLock.json";
 import TransactionProgress from "./TransactionProgress";
 import erc20abi from "erc-20-abi";
-import { KEYUTIL, RSAKey, KJUR } from "jsrsasign";
-import { importJWK, jwtVerify, SignJWT } from "jose";
+import { importJWK, jwtVerify, SignJWT } from "jose"; // Updated import
 import axios from "axios";
-// import { OAuth2Client } from "google-auth-library";
-// import * as crypto from "crypto";
 
 const SocialLockAddress = import.meta.env.VITE_SOCIAL_LOCK_ADDRESS;
-const CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
-// const client = new OAuth2Client(CLIENT_ID);
 
 function Withdrawal() {
   const { address, isConnected } = useAccount();
@@ -66,6 +61,7 @@ function Withdrawal() {
   );
 
   async function onLogin(credentialResponse: CredentialResponse) {
+    console.log("credentials : ");
     console.log(credentialResponse);
     if (credentialResponse.credential) {
       const { header, payload, hexSig } = parseJwt(
@@ -108,6 +104,168 @@ function Withdrawal() {
     );
   }
 
+  // async function verifyJwt(token: any) {
+  //   const response = await axios.get(
+  //     "https://www.googleapis.com/oauth2/v3/certs"
+  //   );
+  //   const keys = response.data.keys;
+
+  //   const { header, payload, hexSig } = parseJwt(token);
+  //   const parsedHeader = JSON.parse(header);
+  //   const kid = parsedHeader.kid;
+  //   console.log("KID FROM TOKEN IS : ", kid);
+  //   const key = keys.find((k: any) => k.kid === kid);
+  //   if (!key) {
+  //     throw new Error("Key ID not found in JWKS");
+  //   }
+
+  //   const keyObj = await importJWK({
+  //     kty: key.kty,
+  //     n: key.n,
+  //     e: key.e,
+  //     alg: key.alg,
+  //     use: key.use,
+  //   });
+
+  //   const { payload: verifiedPayload, protectedHeader } = await jwtVerify(
+  //     token,
+  //     keyObj
+  //   );
+
+  //   return !!verifiedPayload;
+  // }
+
+  // async function verifyJwt(token: any) {
+  //   const response = await axios.get(
+  //     "https://www.googleapis.com/oauth2/v3/certs"
+  //   );
+  //   const keys = response.data.keys;
+
+  //   const { header, payload, hexSig } = parseJwt(token);
+  //   const parsedHeader = JSON.parse(header);
+  //   const kid = parsedHeader.kid;
+  //   console.log("KID FROM TOKEN IS:", kid);
+  //   const key = keys.find((k) => k.kid === kid);
+  //   if (!key) {
+  //     throw new Error("Key ID not found in JWKS");
+  //   }
+
+  //   const keyObj = await importJWK({
+  //     kty: key.kty,
+  //     n: key.n,
+  //     e: key.e,
+  //     alg: key.alg,
+  //     use: key.use,
+  //   });
+
+  //   try {
+  //     const { payload: verifiedPayload, protectedHeader } = await jwtVerify(
+  //       token,
+  //       keyObj
+  //     );
+  //     return !!verifiedPayload;
+  //   } catch (e) {
+  //     console.log("Verification failed:", e);
+  //     return false;
+  //   }
+  // }
+
+  // async function verifyJwt(token) {
+  //   const response = await axios.get("https://www.googleapis.com/oauth2/v3/certs");
+  //   const keys = response.data.keys;
+
+  //   const { header, payload, signature, modifiedToken } = parseJwt(token);
+  //   const parsedHeader = JSON.parse(header);
+  //   const kid = parsedHeader.kid;
+  //   console.log("KID FROM TOKEN IS:", kid);
+  //   const key = keys.find((k) => k.kid === kid);
+  //   if (!key) {
+  //     throw new Error("Key ID not found in JWKS");
+  //   }
+
+  //   const keyObj = await importJWK({
+  //     kty: key.kty,
+  //     n: key.n,
+  //     e: key.e,
+  //     alg: key.alg,
+  //     use: key.use,
+  //   });
+
+  //   try {
+  //     const { payload: verifiedPayload, protectedHeader } = await jwtVerify(modifiedToken, keyObj);
+  //     return !!verifiedPayload;
+  //   } catch (e) {
+  //     console.log("Verification failed:", e);
+  //     return false;
+  //   }
+  // }
+
+  async function verifyJwt(token) {
+    const response = await axios.get(
+      "https://www.googleapis.com/oauth2/v3/certs"
+    );
+    const keys = response.data.keys;
+
+    const { header, payload, signature, modifiedToken } = parseJwt(token);
+    const parsedHeader = JSON.parse(header);
+    const kid = parsedHeader.kid;
+    console.log("KID FROM TOKEN IS:", kid);
+    const key = keys.find((k) => k.kid === kid);
+    if (!key) {
+      throw new Error("Key ID not found in JWKS");
+    }
+
+    const keyObj = await importJWK({
+      kty: key.kty,
+      n: key.n,
+      e: key.e,
+      alg: key.alg,
+      use: key.use,
+    });
+
+    try {
+      const { payload: verifiedPayload, protectedHeader } = await jwtVerify(
+        modifiedToken,
+        keyObj
+      );
+      return !!verifiedPayload;
+    } catch (e) {
+      console.log("Verification failed:", e);
+      return false;
+    }
+  }
+
+  async function generateGarbageJwt() {
+    // Create a garbage JWT for testing
+    const fakePayload = {
+      sub: "fake-sub",
+      email: "fake@example.com",
+      nonce: "fake-nonce",
+    };
+    const fakeKey = {
+      kty: "RSA",
+      n: "fake-n",
+      e: "AQAB",
+      alg: "RS256",
+      use: "sig",
+    };
+
+    const keyObj = await importJWK(fakeKey);
+    const token = await new SignJWT(fakePayload)
+      .setProtectedHeader({ alg: "RS256", kid: "fake-kid" })
+      .setIssuedAt()
+      .setExpirationTime("2h")
+      .sign(keyObj);
+
+    return token;
+  }
+
+  async function testGarbageJwt() {
+    const garbageJwt = await generateGarbageJwt();
+    const isValid = await verifyJwt(garbageJwt);
+    console.log("Garbage JWT is valid:", isValid); // Should print false
+  }
+
   async function updateAvailable(email: string) {
     if (!socialLock) throw "Error: SocialLock contract not found.";
     console.log(
@@ -122,188 +280,67 @@ function Withdrawal() {
     setAmountAvailable(ethers.utils.formatEther(value));
   }
 
-  function parseJwt1(token: string) {
+  // function parseJwt(token: string) {
+  //   const parts = token.split(".");
+  //   const header = Buffer.from(parts[0], "base64").toString();
+  //   const payload = Buffer.from(parts[1], "base64").toString();
+
+  //   // Tweak the signature to ensure it cannot be verified
+  //   const signature = Buffer.from(parts[2], "base64").toString("hex");
+  //   const tweakedSignature = signature
+  //     .split("")
+  //     .map((char, index) => {
+  //       // Change the first character of the signature to '0' to invalidate it
+  //       return index === 0 ? "7" : char;
+  //     })
+  //     .join("");
+
+  //   const hexSig = "0x" + tweakedSignature;
+
+  //   return {
+  //     header,
+  //     payload,
+  //     hexSig,
+  //   };
+
+  // Function to parse and modify JWT
+  function parseJwt(token: any) {
+    const parts = token.split(".");
+    const header = Buffer.from(parts[0], "base64").toString();
+    const payload = Buffer.from(parts[1], "base64").toString();
+
+    // Modify the signature to ensure it cannot be verified
+    const signature = parts[2]
+      .split("")
+      .map((char: any, index: any) => {
+        // Change the first character of the signature to 'A' to invalidate it
+        return index === 0 ? "A" : char;
+      })
+      .join("");
+
+    // Return the modified token parts
     return {
-      header: Buffer.from(token.split(".")[0], "base64").toString(),
-      payload: Buffer.from(token.split(".")[1], "base64").toString(),
-      hexSig: Buffer.from(token.split(".")[2], "base64").toString("hex"),
-      signature: Buffer.from(token.split(".")[2], "base64"),
+      header,
+      payload,
+      signature,
+      modifiedToken: `${parts[0]}.${parts[1]}.${signature}`,
     };
   }
 
-  function parseJwt(token: string) {
-    return {
-      header: Buffer.from(token.split(".")[0], "base64").toString(),
-      payload: Buffer.from(token.split(".")[1], "base64").toString(),
-      hexSig: "0x" + Buffer.from(token.split(".")[2], "base64").toString("hex"),
-    };
-  }
-
-  function verifySignature(
-    message: string,
-    signature: string,
-    modulus: string,
-    exponent: string
-  ): boolean {
-    const rsaKey = KEYUTIL.getKey({ n: modulus, e: exponent });
-    const sig = new KJUR.crypto.Signature({ alg: "SHA256withRSA" });
-    sig.init(rsaKey);
-    sig.updateString(message);
-
-    return sig.verify(signature);
-  }
-
-  // async function verifyGoogleIdToken(token: string) {
-  //   try {
-  //     const ticket = await client.verifyIdToken({
-  //       idToken: token,
-  //       audience: CLIENT_ID, // Specify the CLIENT_ID of the app that accesses the backend
-  //     });
-
-  //     const payload = ticket.getPayload();
-  //     if (!payload) {
-  //       throw new Error("Invalid token payload");
-  //     }
-
-  //     const userId = payload["sub"];
-  //     console.log("User ID:", userId);
-  //     console.log("Token Payload:", payload);
-
-  //     // You can also check additional claims such as 'hd' (hosted domain)
-  //     // const domain = payload['hd'];
-  //     return payload;
-  //   } catch (error) {
-  //     console.error("Error verifying ID token:", error);
-  //     throw error;
-  //   }
-  // }
-
-  // async function verifyJwt(token: string) {
-  //   const response = await axios.get(
-  //     "https://www.googleapis.com/oauth2/v3/certs"
-  //   );
-  //   const keys = response.data.keys;
-
-  //   const { header, payload, hexSig, signature } = parseJwt1(token);
-  //   const parsedHeader = JSON.parse(header);
-  //   const kid = parsedHeader.kid;
-  //   console.log("KID FROM TOKEN IS:", kid);
-  //   const key = keys.find((k: any) => k.kid === kid);
-  //   if (!key) {
-  //     throw new Error("Key ID not found in JWKS");
-  //   }
-
-  //   const keyObj = await importJWK({
-  //     kty: key.kty,
-  //     n: key.n,
-  //     e: key.e,
-  //     alg: key.alg,
-  //     use: key.use,
-  //   });
-
-  //   // Concatenate header and payload to form the message
-  //   const message = `${token.split(".")[0]}.${token.split(".")[1]}`;
-
-  //   // Verify the signature
-  //   const isValid = verifySignature(
-  //     message,
-  //     signature.toString("base64"),
-  //     key.n,
-  //     key.e
-  //   );
-
-  //   return isValid;
-  // }
-
-  async function verifyJwt(token: string) {
-    const response = await axios.get(
-      "https://www.googleapis.com/oauth2/v3/certs"
-    );
-    const keys = response.data.keys;
-
-    const { header, payload, hexSig } = parseJwt(token);
-    const parsedHeader = JSON.parse(header);
-    const kid = parsedHeader.kid;
-    console.log("KID FROM TOKEN IS:", kid);
-
-    const key = keys.find((k: any) => k.kid === kid);
-    if (!key) {
-      throw new Error("Key ID not found in JWKS");
-    }
-
-    const modulus = Buffer.from(key.n, "base64").toString("hex");
-    const exponent = Buffer.from(key.e, "base64").toString("hex");
-
-    console.log("Modulus:", modulus);
-    console.log("Exponent:", exponent);
-
-    // Concatenate header and payload to form the message
-    const message = `${token.split(".")[0]}.${token.split(".")[1]}`;
-    console.log("Message to be verified:", message);
-
-    // Verify the signature
-    const isValid = verifySignature(
-      message,
-      Buffer.from(hexSig, "hex").toString("base64"),
-      modulus,
-      exponent
-    );
-
-    console.log("Is the signature valid?", isValid);
-    return isValid;
-  }
-
-  // try {
-  //   const { payload: verifiedPayload, protectedHeader } = await jwtVerify(
-  //     modifiedToken,
-  //     keyObj
-  //   );
-  //   return !!verifiedPayload;
-  // } catch (e) {
-  //   console.log("Verification failed:", e);
-  //   return false;
-  // }
-  // }
+  // return {
+  //   header: Buffer.from(token.split(".")[0], "base64").toString(),
+  //   payload: Buffer.from(token.split(".")[1], "base64").toString(),
+  //   hexSig: "0x" + Buffer.from(token.split(".")[2], "base64").toString("hex"),
+  // };
 
   async function withdraw() {
     try {
       if (!socialLock) throw "Error: SocialLock contract not found.";
       const { header, payload, hexSig } = parseJwt(jwt);
-      verifyJwt(jwt)
-        .then((isValid) => console.log("JWT is valid:", isValid))
-        .catch((error) => console.error("Error verifying JWT:", error));
 
-      // verifyGoogleIdToken(jwt)
-      //   .then((payload) => console.log("GOOGLE JWT is valid:", payload))
-      //   .catch((error) =>
-      //     console.error("GOOGLE JWT verification failed:", error)
-      //   );
-
-      // SENDING THE TOKEN TO BACKEND SERVER INSTEAD :
-      // Send JWT token to the server for verification
-      const verifyJwtOnServer = async (jwt: string) => {
-        const response = await fetch("http://localhost:3000/verify-token", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ token: jwt }),
-        });
-        return response.json();
-      };
-
-      const verificationResult = await verifyJwtOnServer(jwt);
-      if (verificationResult.success) {
-        console.log("GGOGLE JWT is valid:", verificationResult);
-      } else {
-        console.error(
-          "GOOGLE JWT verification failed:",
-          verificationResult.message
-        );
-        throw new Error("GOOGLE JWT verification failed");
-      }
-
-      // SENDING BACKEND TOKEN STOP
+      const verificationResponse = await verifyJwt(jwt);
+      console.log("hello");
+      console.log(verificationResponse);
 
       if (isToken) {
         if (!signer) throw "Error: Signer not found.";
@@ -323,7 +360,7 @@ function Withdrawal() {
         setTx(tx);
       } else {
         const value = ethers.utils.parseEther(amount);
-        console.log("YOUR SIGNATURE IS : ", hexSig);
+        console.log("Value of header is : ", header);
         const tx = await socialLock.withdraw(header, payload, hexSig, value);
         setTx(tx);
       }
@@ -411,6 +448,7 @@ function Withdrawal() {
               </FormControl>
               <FormControl sx={{ m: 1, width: "25ch" }}>
                 <Button onClick={withdraw}>Withdraw!</Button>
+                <Button onClick={testGarbageJwt}>Test Garbage JWT</Button>
               </FormControl>
             </form>
           )}

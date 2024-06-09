@@ -1,7 +1,7 @@
 import { ethers } from "hardhat";
 
 async function main() {
-    const JWKSOracle = await ethers.getContractFactory("JWKSOracle");
+    const JWKSOracle = await ethers.getContractFactory("JWKSOracleBackup");
     const jwksoracle = await JWKSOracle.deploy();
     console.log(`Deployed JWKSOracle at ${jwksoracle.address}`);
 }

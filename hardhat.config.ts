@@ -49,6 +49,13 @@ const config: HardhatUserConfig = {
       accounts: [privateKey],
     },
   },
+  gasReporter :
+  {
+    enabled:true,
+    currency:"USD",
+    coinmarketcap:"c30a2b67-b8e2-4176-9bf1-29017c97aa8c",
+    outputFile:"gas-report.txt",
+  },
   etherscan: {
     apiKey: ETHERSCAN_KEY,
   },
@@ -59,6 +66,8 @@ task("deploySocialLock", "Deploys Social Lock")
   .addParam('aud', 'Google OAuth aud value, e.g. 1234567890-1234567890.apps.googleusercontent.com', undefined, types.string)
   .addParam('jwks', 'JWKS Oracle address', undefined, types.string)
   .setAction(async ({ aud, jwks }, hre) => {
+
+  
     const SocialLock = await hre.ethers.getContractFactory("SocialLock");
     const socialLock = await SocialLock.deploy(aud, jwks);
     console.log(`socialLock deployed to ${socialLock.address}`);

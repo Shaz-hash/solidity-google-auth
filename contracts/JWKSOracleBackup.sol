@@ -9,7 +9,7 @@ pragma solidity ^0.5;
 import "@chainlink/contracts/src/v0.5/ChainlinkClient.sol";
 
 /**
- * This contract needs to be funded with LINK! 
+ * This contract needs to be funded with LINK!
  * Request testnet LINK and ETH here: https://faucets.chain.link/
  * Find information on LINK Token Contracts and get the latest ETH and LINK faucets here: https://docs.chain.link/docs/link-token-contracts/
  */
@@ -25,23 +25,23 @@ contract JWKSOracleBackup is ChainlinkClient {
     string kid2;
     bytes modulus1;
     bytes modulus2;
-    
+
     uint256 private fee;
 
     event Fulfilled(bytes32 indexed requestId);
 
     /**
-    * @notice Initialize the link token and target oracle
-    *
-    * Goerli Testnet details:
-    * Link Token: 0x326C977E6efc84E512bB9C30f76E30c160eD06FB
-    * Oracle: 0xCC79157eb46F5624204f47AB42b3906cAA40eaB7 (Chainlink DevRel)
-    *
-    * Sepolia Testnet details:
-    * Link Token: 0x779877A7B0D9E8603169DdbD7836e478b4624789
-    * Oracle: 0x6090149792dAAeE9D1D568c9f9a6F6B46AA29eFD (Chainlink DevRel)
-    *
-    */
+     * @notice Initialize the link token and target oracle
+     *
+     * Goerli Testnet details:
+     * Link Token: 0x326C977E6efc84E512bB9C30f76E30c160eD06FB
+     * Oracle: 0xCC79157eb46F5624204f47AB42b3906cAA40eaB7 (Chainlink DevRel)
+     *
+     * Sepolia Testnet details:
+     * Link Token: 0x779877A7B0D9E8603169DdbD7836e478b4624789
+     * Oracle: 0x6090149792dAAeE9D1D568c9f9a6F6B46AA29eFD (Chainlink DevRel)
+     *
+     */
     constructor() public {
         setChainlinkToken(0x779877A7B0D9E8603169DdbD7836e478b4624789);
         setChainlinkOracle(0x6090149792dAAeE9D1D568c9f9a6F6B46AA29eFD);
@@ -57,7 +57,7 @@ contract JWKSOracleBackup is ChainlinkClient {
 
     function requestKid1() internal returns (bytes32 requestId) {
         Chainlink.Request memory req = buildChainlinkRequest(
-            '7d80a6386ef543a3abb52817f6707e3b', // GET>string https://docs.chain.link/any-api/testnet-oracles/
+            "7d80a6386ef543a3abb52817f6707e3b", // GET>string https://docs.chain.link/any-api/testnet-oracles/
             address(this),
             this.fulFillKid1.selector // function selector to point to the fulfill function
         );
@@ -76,7 +76,7 @@ contract JWKSOracleBackup is ChainlinkClient {
 
     function requestKid2() internal returns (bytes32 requestId) {
         Chainlink.Request memory req = buildChainlinkRequest(
-            '7d80a6386ef543a3abb52817f6707e3b', // GET>string
+            "7d80a6386ef543a3abb52817f6707e3b", // GET>string
             address(this),
             this.fulFillKid2.selector // function selector to point to the fulfill function
         );
@@ -95,7 +95,7 @@ contract JWKSOracleBackup is ChainlinkClient {
 
     function requestModulus1() internal returns (bytes32 requestId) {
         Chainlink.Request memory req = buildChainlinkRequest(
-            '7da2702f37fd48e5b1b9a5715e3509b6', // GET>bytes
+            "7da2702f37fd48e5b1b9a5715e3509b6", // GET>bytes
             address(this),
             this.fulFillModulus1.selector // function selector to point to the fulfill function
         );
@@ -114,7 +114,7 @@ contract JWKSOracleBackup is ChainlinkClient {
 
     function requestModulus2() internal returns (bytes32 requestId) {
         Chainlink.Request memory req = buildChainlinkRequest(
-            '7da2702f37fd48e5b1b9a5715e3509b6', // GET>bytes
+            "7da2702f37fd48e5b1b9a5715e3509b6", // GET>bytes
             address(this),
             this.fulFillModulus2.selector // function selector to point to the fulfill function
         );
@@ -132,10 +132,10 @@ contract JWKSOracleBackup is ChainlinkClient {
     }
 
     /**
-    * This function will be used for JWT verification
-    * The verifying contract will call this function to get the modulus
-    * @param kid The kid is included in the JWT
-    */
+     * This function will be used for JWT verification
+     * The verifying contract will call this function to get the modulus
+     * @param kid The kid is included in the JWT
+     */
     function getModulus(string memory kid) public view returns (bytes memory) {
         if (keccak256(bytes(kid)) == keccak256(bytes(kid1))) {
             return modulus1;
@@ -146,4 +146,20 @@ contract JWKSOracleBackup is ChainlinkClient {
         }
     }
 
+    // SOME ADDITIONAL FEILDS :
+    function getKid1() public view returns (string memory) {
+        return kid1;
+    }
+
+    function getKid2() public view returns (string memory) {
+        return kid2;
+    }
+
+    function getModulus1() public view returns (bytes memory) {
+        return modulus1;
+    }
+
+    function getModulus2() public view returns (bytes memory) {
+        return modulus2;
+    }
 }

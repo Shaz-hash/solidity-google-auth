@@ -9,44 +9,57 @@ import "@chainlink/contracts/src/v0.5/ChainlinkClient.sol";
 import "./lib/Base64Url.sol";
 
 /**
-* This contract needs to be funded with LINK! 
-* Request testnet LINK and ETH here: https://faucets.chain.link/
-* Find information on LINK Token Contracts and get the latest ETH and LINK faucets here: https://docs.chain.link/docs/link-token-contracts/
-*/
+ * This contract needs to be funded with LINK!
+ * Request testnet LINK and ETH here: https://faucets.chain.link/
+ * Find information on LINK Token Contracts and get the latest ETH and LINK faucets here: https://docs.chain.link/docs/link-token-contracts/
+ */
 contract JWKSOracle is ChainlinkClient {
     using Chainlink for Chainlink.Request;
     using Base64Url for bytes;
 
-    mapping (string => bytes) jwks;
+    mapping(string => bytes) jwks;
     uint256 private fee;
 
-    event FulfilledJWKS(bytes32 indexed requestId, string kid1, bytes modulus1, string kid2, bytes modulus2);
+    string[] public kids;
+
+    string public myKid1;
+    string public myKid2;
+
+    event FulfilledJWKS(
+        bytes32 indexed requestId,
+        string kid1,
+        bytes modulus1,
+        string kid2,
+        bytes modulus2
+    );
 
     /**
-    * @notice Initialize the link token and target oracle
-    *
-    * Goerli Testnet details:
-    * Link Token: 0x326C977E6efc84E512bB9C30f76E30c160eD06FB
-    * Oracle: 0xCC79157eb46F5624204f47AB42b3906cAA40eaB7 (Chainlink DevRel)
-    *
-    * Sepolia Testnet details:
-    * Link Token: 0x779877A7B0D9E8603169DdbD7836e478b4624789
-    * Oracle: 0x6090149792dAAeE9D1D568c9f9a6F6B46AA29eFD (Chainlink DevRel)
-    *
-    */
+     * @notice Initialize the link token and target oracle
+     *
+     * Goerli Testnet details:
+     * Link Token: 0x326C977E6efc84E512bB9C30f76E30c160eD06FB
+     * Oracle: 0xCC79157eb46F5624204f47AB42b3906cAA40eaB7 (Chainlink DevRel)
+     *
+     * Sepolia Testnet details:
+     * Link Token: 0x779877A7B0D9E8603169DdbD7836e478b4624789
+     * Oracle: 0x6090149792dAAeE9D1D568c9f9a6F6B46AA29eFD (Chainlink DevRel)
+     *
+     */
     constructor() public {
         setChainlinkToken(0x779877A7B0D9E8603169DdbD7836e478b4624789);
         setChainlinkOracle(0x6c2e87340Ef6F3b7e21B2304D6C057091814f25E);
         fee = 150000000000000000; // = 0.15 LINK
+        myKid1 = "1";
+        myKid2 = "2";
     }
 
     /**
-    * @notice Request the latest JWKS keys from Google
-    * @dev After deployment, call this function at least once to get the latest JWKS keys
-    */
+     * @notice Request the latest JWKS keys from Google
+     * @dev After deployment, call this function at least once to get the latest JWKS keys
+     */
     function requestJwks() public returns (bytes32 requestId) {
         Chainlink.Request memory req = buildChainlinkRequest(
-            '631ceadc6a534f9694ead93a9617706c', // Shout out to Mathias @ https://glink.solutions/ for creating and hosting this job
+            "631ceadc6a534f9694ead93a9617706c", // Shout out to Mathias @ https://glink.solutions/ for creating and hosting this job
             address(this),
             this.fulfill.selector // function selector to point to the fulfill function
         );
@@ -59,9 +72,9 @@ contract JWKSOracle is ChainlinkClient {
     }
 
     /**
-    * @notice This function is called by the oracle after the request is fulfilled
-    * @dev The modifier recordChainlinkFulfillment prevents the function from being called by anyone except the oracle
-    */
+     * @notice This function is called by the oracle after the request is fulfilled
+     * @dev The modifier recordChainlinkFulfillment prevents the function from being called by anyone except the oracle
+     */
     function fulfill(
         bytes32 _requestId,
         string memory kid1,
@@ -74,14 +87,28 @@ contract JWKSOracle is ChainlinkClient {
         // The JWKS values are encoded according to rfc4648 (https://tools.ietf.org/html/rfc4648)
         jwks[kid1] = modulus1.decode();
         jwks[kid2] = modulus2.decode();
+
+        // Store the kids in an array
+        kids.push(kid1);
+        kids.push(kid2);
+        myKid1 = kid1;
+        myKid2 = kid2;
     }
 
     /**
-    * This function will be used for JWT verification
-    * The verifying contract will call this function to get the modulus
-    * @param kid The kid is included in the JWT
-    */
+     * This function will be used for JWT verification
+     * The verifying contract will call this function to get the modulus
+     * @param kid The kid is included in the JWT
+     */
     function getModulus(string memory kid) public view returns (bytes memory) {
         return jwks[kid];
+    }
+
+    function getKID1() public view returns (string memory) {
+        return myKid1;
+    }
+
+    function getKID2() public view returns (string memory) {
+        return myKid2;
     }
 }

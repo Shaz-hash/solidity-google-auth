@@ -4,3 +4,55 @@ shazer@Shazers-MacBook-Air solidity-google-auth % npx hardhat run scripts/deploy
 0x29a51884dea81b2eb575cd46bd51bd703cfb4c45e44ff0ee00f113b7b4339088 f95f2b17b00a4d24b20398a713322329 45QAVBQBP887SDN66BDU7GD5G5XVV3ZBFG
 Deployed JWKSOracle at 0x9d9749c50FaE5533ffb86ea3a5EffA10559eadB4
 shazer@Shazers-MacBook-Air solidity-google-auth % 
+
+
+shazer@Shazers-MacBook-Air solidity-google-auth % npx hardhat deploySocialLock --aud 366295381014-0gamnvjo0u7bj7kulot9v8han8calkkm.apps.googleusercontent.com --jwks 0x9d9749c50FaE5533ffb86ea3a5EffA10559eadB4 --network sepolia
+WARNING: You are currently using Node.js v16.17.0, which is not supported by Hardhat. This can lead to unexpected behavior. See https://hardhat.org/nodejs-versions
+
+
+0x29a51884dea81b2eb575cd46bd51bd703cfb4c45e44ff0ee00f113b7b4339088 f95f2b17b00a4d24b20398a713322329 45QAVBQBP887SDN66BDU7GD5G5XVV3ZBFG
+socialLock deployed to 0xc58409CEaA58B492a4Fe8cf70A8Cfc4C88370C49
+shazer@Shazers-MacBook-Air solidity-google-auth % 
+
+
+
+
+
+
+NEW HARDCODED CONTRACT DEPLOYMENT : 
+0x4b18eB0Cf39bcEd941bb7BF1856D5e6e4Ad980e9
+
+
+
+
+
+
+366295381014-0gamnvjo0u7bj7kulot9v8han8calkkm.apps.googleusercontent.com
+366295381014-0gamnvjo0u7bj7kulot9v8han8calkkm.apps.googleusercontent.com
+366295381014-0gamnvjo0u7bj7kulot9v8han8calkkm.apps.googleusercontent.com
+
+
+
+Deployed NEW JWKSOracle at 0x911637EC0f74b147DD6947FF4d4e3934e76Ed965
+socialLock deployed to 0x5FbDB2315678afecb367f032d93F642f64180aa3
+
+
+
+
+
+
+
+HARDCODEWD : 
+JWKS with deployed to 0x83e114cA2d2EA17157145425650bEC5F02715C1c
+socialLock deployed to 0x1a682175C11BbD2A210275D291A3d9068027BB39
+
+
+
+
+BACKUP TRY : 
+0xBDB1c003f01Bc07F336B92B2dea3000D28d43566
+socialLock deployed to 0x3D99c46b719B57487df3f676F392Af36cfFF7d1F
+
+contract # 2 :
+    0x668f02cc4270AAbC335Fb897d05D7dBe3AEe3a15
+social : 0x469a5861b6C0C410AD201512abbc1D891bF80481

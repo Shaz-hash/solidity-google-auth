@@ -16,11 +16,17 @@
     "@react-oauth/google": "^0.8.0",
     "erc-20-abi": "^1.0.0",
     "ethers": "^5.7.2",
+    "google-auth-library": "^9.10.0",
+    "jose": "^5.4.0",
+    "jsrsasign": "^11.1.0",
+    "node-jose": "^2.2.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "wagmi": "^0.12.7"
   },
   "devDependencies": {
+    "@types/jsrsasign": "^10.5.14",
+    "@types/node-jose": "^1.1.13",
     "@types/react": "^18.0.27",
     "@types/react-dom": "^18.0.10",
     "@vitejs/plugin-react": "^3.1.0",
